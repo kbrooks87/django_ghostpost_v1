@@ -1,46 +1,56 @@
-from django.shortcuts import render, HttpResponseRedirect, reverse
+from django.shortcuts import render, reverse, HttpResponseRedirect
 
-from ghostpost_app.models import Posting
-from ghostpost_app.forms import Post_form, Upvoting_form, Downvoting_form
-# Create your views here.
+from ghostpost_app.models import Post
+from ghostpost_app.forms import PostForm
+
+
 
 def index(request):
-    posts = Posting.objects.all()
-
-    return render(request, "index.html", {"posts": posts})
-
-
-def new_post_view(request):
-    if request.method == "POST":
-        form = Post_form(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            Posting.objects.create(
-                boast=data.get("boast"),
-                roast=data.get("roast"),
-                body=data.get("body")
-            )
-            return HttpResponseRedirect(reverse('newpost'))
-        form = Post_form()
-        return render(request, "new_post.html", {"form": form})
+  posts = Post.objects.all().order_by('-postDate')
+  return render(request, 'index.html', {"posts":posts})
 
 
-def upvoting_view(request):
-    if request == "POST":
-        form = Upvoting_form(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            Posting.upvote = Posting.upvote + 1
-        form = Upvoting_form()
-        return render(request, "index.html", {"upvote": form})
+def boasts(request):
+  posts = Post.objects.filter(isBoast=True).order_by('-postDate')
+  return render(request, 'index.html', {"posts":posts})
 
 
-def downvoting_view(request):
-    if request == "POST":
-        form = Downvoting_form(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            Posting.downvote = Posting.downvote + 1
-        form = Downvoting_form()
-        return render(request, "index.html", {"downvote": form})
+def roasts(request):
+  posts = Post.objects.filter(isBoast=False).order_by('-postDate')
+  return render(request, 'index.html', {"posts":posts})
 
+
+def sorted_view(request):
+  posts = Post.objects.all()
+  posts = sorted(posts, key=lambda post: post.total, reverse=True)
+  return render(request, 'index.html', {"posts": posts})
+
+
+def add_post_view(request):
+  if request.method == "POST":
+    form = PostForm(request.POST)
+    if form.is_valid():
+      data = form.cleaned_data
+      Post.objects.create(
+        isBoast=data['post_choices'],
+        body=data['post'],
+        upVotes=0,
+        downVotes=0,
+      )
+      return HttpResponseRedirect(request.GET.get('next', reverse('home')))
+  form = PostForm()
+  return render(request, 'generic_form.html', {'form': form})
+
+
+def upVote(request, id):
+  post = Post.objects.filter(id=id).first()
+  post.upVotes += 1
+  post.save()
+  return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def downVote(request, id):
+  post = Post.objects.filter(id=id).first()
+  post.downVotes += 1
+  post.save()
+  return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

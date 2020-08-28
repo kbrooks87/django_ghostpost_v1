@@ -14,14 +14,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+
 from django.urls import path
 
 from ghostpost_app import views 
 
 urlpatterns = [
-    path('', views.index, name="homepage"),
-    path('newpost/', views.new_post_view, name="newpost"),
-    path('upvote/', views.upvoting_view, name="upvote"),
-    path('downvote/', views.downvoting_view, name="downvote"),
+    path('', views.index, name='home'),
+    path('boasts/', views.boasts),
+    path('roasts/', views.roasts),
+    path('sorted/', views.sorted_view),
+    path('add_post/', views.add_post_view),
+    path('post/<int:id>/', views.sorted_view),
+    path('upvote/<int:id>/', views.upVote),
+    path('downvote/<int:id>/', views.downVote),
     path('admin/', admin.site.urls),
 ]

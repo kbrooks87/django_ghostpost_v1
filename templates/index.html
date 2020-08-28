@@ -1,22 +1,22 @@
-<!-- CSS only -->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+{% extends 'base.html' %}
 
-<!-- JS, Popper.js, and jQuery -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
-
-<div>
-    <h1>Homepage</h1>
-    <a href="newpost">make new post</a>
+<!-- I got help from https://docs.djangoproject.com/en/3.1/ref/templates/builtins/#yesno to determine if it was a Boast or Roast-->
+{% block content %}
+  <div class="container">
     {% for post in posts %}
-    <pre>
-        {{ post }}
-    </pre>
-    <h2>Upvote: {{ post.upvote }}</h2>
-    <a href="upvote">+1 for upvote</a>
-    <h2>Downvote: {{ post.downvote }}</h2>
-    <a href="downvote">+1 for downvote</a>
+      <div>
+        <h2>{{ post.body }}</h2>
+        <ul>
+          <li>{{ post.isBoast|yesno:"Boast,Roast" }}</li>
+          <li>{{ post.postDate }}</li>
+          <span>{{ post.total }}</span>
+          <br>
+          <button>
+            <a href="/upvote/{{ post.id }}/">Up Vote</a> </button> <button> <a href="/downvote/{{ post.id }}/">Down Vote</a>
 
+          </button>
+        </ul>
+      </div>
     {% endfor %}
-</div>
+  </div>
+{% endblock content %}
